@@ -1,19 +1,19 @@
 
 Pod::Spec.new do |s|
   s.name             = "MZDownloadManager"
-  s.version          = "3.7.0"
+  s.version          = "3.7.1"
   s.summary          = "URLSession based download manager."
 
   s.description      = <<-DESC
                         Download large files even in background, download multiple files, resume interrupted downloads.
                        DESC
 
-  s.homepage         = "https://github.com/mzeeshanid/MZDownloadManager"
+  s.homepage         = "https://github.com/AbdullahFaqeir/MZDownloadManager"
   s.screenshots      = "https://cloud.githubusercontent.com/assets/2767152/3459842/0c40fe66-0211-11e4-90d8-d8942c8f8651.png"
   s.license          = 'BSD'
   s.author           = { "Muhammad Zeeshan" => "mzeeshanid@yahoo.com" }
-  s.source           = { :git => "https://github.com/mzeeshanid/MZDownloadManager.git", :tag => s.version }
-  s.social_media_url = 'https://twitter.com/mzeeshanid'
+  s.source           = { :git => "https://github.com/AbdullahFaqeir/MZDownloadManager.git", :tag => s.version }
+  s.social_media_url = 'https://twitter.com/abdullahfaqeir'
 
   s.ios.deployment_target = '9.0'
 
