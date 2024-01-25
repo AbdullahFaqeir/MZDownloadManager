@@ -157,10 +157,7 @@ extension MZDownloadManager: URLSessionDownloadDelegate {
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         for (index, downloadModel) in self.downloadingArray.enumerated() {
             if downloadTask.isEqual(downloadModel.task) {
-                DispatchQueue.main.async(execute: { () -> Void in
-                    guard weak let weakSelf = self else {
-                        return
-                    }
+                DispatchQueue.main.async(execute: { [weak self] in                
                     let taskStartedDate = downloadModel.startTime ?? Date()
                     let timeInterval = taskStartedDate.timeIntervalSinceNow
                     let downloadTime = TimeInterval(-1 * timeInterval)
@@ -198,11 +195,11 @@ extension MZDownloadManager: URLSessionDownloadDelegate {
                     downloadModel.speed = (speedSize, speedUnit as String)
                     downloadModel.progress = progress
                     
-                    if weakSelf.downloadingArray.contains(downloadModel), let objectIndex = weakSelf.downloadingArray.index(of: downloadModel) {
-                        weakSelf.downloadingArray[objectIndex] = downloadModel
+                    if self.downloadingArray.contains(downloadModel), let objectIndex = self.downloadingArray.index(of: downloadModel) {
+                        self.downloadingArray[objectIndex] = downloadModel
                     }
                     
-                    weakSelf.delegate?.downloadRequestDidUpdateProgress(downloadModel, index: index)
+                    self.delegate?.downloadRequestDidUpdateProgress(downloadModel, index: index)
                 })
                 break
             }
