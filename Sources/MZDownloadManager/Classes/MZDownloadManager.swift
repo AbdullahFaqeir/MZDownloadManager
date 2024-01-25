@@ -158,7 +158,7 @@ extension MZDownloadManager: URLSessionDownloadDelegate {
         for (index, downloadModel) in self.downloadingArray.enumerated() {
             if downloadTask.isEqual(downloadModel.task) {
                 DispatchQueue.main.async(execute: { () -> Void in
-                    guard let weak weakSelf = self else {
+                    guard weak let weakSelf = self else {
                         return
                     }
                     let taskStartedDate = downloadModel.startTime ?? Date()
