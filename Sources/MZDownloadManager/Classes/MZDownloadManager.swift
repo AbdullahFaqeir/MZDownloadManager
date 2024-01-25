@@ -8,23 +8,23 @@
 
 import UIKit
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l < r
+    case (nil, _?):
+        return true
+    default:
+        return false
+    }
 }
 
 fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l > r
+    default:
+        return rhs < lhs
+    }
 }
 
 
@@ -155,53 +155,55 @@ extension MZDownloadManager {
 extension MZDownloadManager: URLSessionDownloadDelegate {
     
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        for (index, downloadModel) in self.downloadingArray.enumerated() {
-            if downloadTask.isEqual(downloadModel.task) {
-                DispatchQueue.main.async(execute: { [weak self] in                
-                    let taskStartedDate = downloadModel.startTime ?? Date()
-                    let timeInterval = taskStartedDate.timeIntervalSinceNow
-                    let downloadTime = TimeInterval(-1 * timeInterval)
-                    
-                    let receivedBytesCount = Double(downloadTask.countOfBytesReceived)
-                    let totalBytesCount = Double(downloadTask.countOfBytesExpectedToReceive)
-                    
-                    guard totalBytesWritten != 0 && downloadTime != 0 else {
-                        return
-                    }
-                    
-                    let progress = Float(receivedBytesCount / totalBytesCount)
-                    let speedFloat = Float(totalBytesWritten) / Float(downloadTime)
-                    let speed = max(1, Int64(speedFloat))
-                    
-                    let remainingContentLength = totalBytesExpectedToWrite - totalBytesWritten
-                    
-                    let remainingTime = remainingContentLength / speed
-                    let hours = Int(remainingTime) / 3600
-                    let minutes = (Int(remainingTime) - hours * 3600) / 60
-                    let seconds = Int(remainingTime) - hours * 3600 - minutes * 60
-                    
-                    let totalFileSize = MZUtility.calculateFileSizeInUnit(totalBytesExpectedToWrite)
-                    let totalFileSizeUnit = MZUtility.calculateUnit(totalBytesExpectedToWrite)
-                    
-                    let downloadedFileSize = MZUtility.calculateFileSizeInUnit(totalBytesWritten)
-                    let downloadedSizeUnit = MZUtility.calculateUnit(totalBytesWritten)
-                    
-                    let speedSize = MZUtility.calculateFileSizeInUnit(speed)
-                    let speedUnit = MZUtility.calculateUnit(speed)
-                    
-                    downloadModel.remainingTime = (hours, minutes, seconds)
-                    downloadModel.file = (totalFileSize, totalFileSizeUnit as String)
-                    downloadModel.downloadedFile = (downloadedFileSize, downloadedSizeUnit as String)
-                    downloadModel.speed = (speedSize, speedUnit as String)
-                    downloadModel.progress = progress
-                    
-                    if self!.downloadingArray.contains(downloadModel), let objectIndex = self!.downloadingArray.index(of: downloadModel) {
-                        self!.downloadingArray[objectIndex] = downloadModel
-                    }
-                    
-                    self!.delegate?.downloadRequestDidUpdateProgress(downloadModel, index: index)
-                })
-                break
+        self.downloadingArray.withUnsafeBufferPointer { ptrDownloadingArray in
+            for (index, downloadModel) in ptrDownloadingArray.enumerated() {
+                if downloadTask.isEqual(downloadModel.task) {
+                    DispatchQueue.main.async(execute: { [weak self] in
+                        let taskStartedDate = downloadModel.startTime ?? Date()
+                        let timeInterval = taskStartedDate.timeIntervalSinceNow
+                        let downloadTime = TimeInterval(-1 * timeInterval)
+                        
+                        let receivedBytesCount = Double(downloadTask.countOfBytesReceived)
+                        let totalBytesCount = Double(downloadTask.countOfBytesExpectedToReceive)
+                        
+                        guard totalBytesWritten != 0 && downloadTime != 0 else {
+                            return
+                        }
+                        
+                        let progress = Float(receivedBytesCount / totalBytesCount)
+                        let speedFloat = Float(totalBytesWritten) / Float(downloadTime)
+                        let speed = max(1, Int64(speedFloat))
+                        
+                        let remainingContentLength = totalBytesExpectedToWrite - totalBytesWritten
+                        
+                        let remainingTime = remainingContentLength / speed
+                        let hours = Int(remainingTime) / 3600
+                        let minutes = (Int(remainingTime) - hours * 3600) / 60
+                        let seconds = Int(remainingTime) - hours * 3600 - minutes * 60
+                        
+                        let totalFileSize = MZUtility.calculateFileSizeInUnit(totalBytesExpectedToWrite)
+                        let totalFileSizeUnit = MZUtility.calculateUnit(totalBytesExpectedToWrite)
+                        
+                        let downloadedFileSize = MZUtility.calculateFileSizeInUnit(totalBytesWritten)
+                        let downloadedSizeUnit = MZUtility.calculateUnit(totalBytesWritten)
+                        
+                        let speedSize = MZUtility.calculateFileSizeInUnit(speed)
+                        let speedUnit = MZUtility.calculateUnit(speed)
+                        
+                        downloadModel.remainingTime = (hours, minutes, seconds)
+                        downloadModel.file = (totalFileSize, totalFileSizeUnit as String)
+                        downloadModel.downloadedFile = (downloadedFileSize, downloadedSizeUnit as String)
+                        downloadModel.speed = (speedSize, speedUnit as String)
+                        downloadModel.progress = progress
+                        
+                        if ptrDownloadingArray.contains(downloadModel), let objectIndex = ptrDownloadingArray.index(of: downloadModel) {
+                            ptrDownloadingArray[objectIndex] = downloadModel
+                        }
+                        
+                        self!.delegate?.downloadRequestDidUpdateProgress(downloadModel, index: index)
+                    })
+                    break
+                }
             }
         }
     }
