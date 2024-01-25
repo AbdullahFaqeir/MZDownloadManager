@@ -195,11 +195,11 @@ extension MZDownloadManager: URLSessionDownloadDelegate {
                     downloadModel.speed = (speedSize, speedUnit as String)
                     downloadModel.progress = progress
                     
-                    if self.downloadingArray.contains(downloadModel), let objectIndex = self.downloadingArray.index(of: downloadModel) {
-                        self.downloadingArray[objectIndex] = downloadModel
+                    if self!.downloadingArray.contains(downloadModel), let objectIndex = self!.downloadingArray.index(of: downloadModel) {
+                        self!.downloadingArray[objectIndex] = downloadModel
                     }
                     
-                    self.delegate?.downloadRequestDidUpdateProgress(downloadModel, index: index)
+                    self!.delegate?.downloadRequestDidUpdateProgress(downloadModel, index: index)
                 })
                 break
             }
